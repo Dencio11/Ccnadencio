@@ -1,2 +1,2 @@
 ﻿#creating dns domain or dns zone
-Add-DnsServerPrimaryZone -Name "NGCP12.com" -ZoneFile "NGCP12.com.dns"
+Add-DnsServerPrimaryZone -Name "ccna21.com" -ZoneFile "ccna21.com.dns"
