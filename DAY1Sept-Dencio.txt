@@ -137,7 +137,7 @@ Int Fa 0/7
   switchport mode access
   switchport voice vlan 100 
   mls qos trust device cisco-phone 
- switchoprt access vlan 1
+ switchport access vlan 1
  end
 
 !IP CAMERAS NEED MAC ADDRESS RESERVATION FOR FIXED IP  (LINE 144 to 151 PASTE TO COREBABA)
