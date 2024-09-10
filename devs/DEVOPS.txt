@@ -1,0 +1,507 @@
+POSTMAN API: LABORATORY 
+
+TASK 1: SET IP ADDRESS ON YOUR VIRTUAL MACHINE. 
+
+1. Open VMWARE -> File -> Open -> locate RIVAN APPS -> IOS -> CSR1000v -> Open
+
+2. Assign a name for your virtual machine and password. 
+
+   Router name: CSR1000v
+   Router username: admin 
+   Password: pass
+
+3. Before Powering on make sure the default network adapter 2 is set to NAT. 
+
+4. Power ON the virtual machine. Press any key to continue. 
+
+5. Type in the following commands: 
+
+	en (for enabling) 
+	sh ip int br (there should not be an ip address assigned since we did not set an 
+	               ip address. 
+				   
+    COMMAND TO ASSIGN AN IP ADDRESS: 
+	
+	conf t 
+	int gi2
+	ip add dhcp 
+	no shut 
+	
+	**wait for your virtual machine to notify you that ip DHCP has been up**
+
+	CHECK IF THERE'S an IP ADDRESS ASSIGNED ON YOUR GIGABIT 1. 
+	
+	COMMAND: 
+	sh ip int br OR do sh ip int br
+	
+
+6. Once you have seen that there is an IP Address already, open your CCNA Desktop 
+   Folder and locate the file named DEVOPSCrashCourse that is located on the bottom
+   and edit with notepad ++. 
+   
+
+
+TASK 2: ENABLE IOX / DOCKER INSIDE YOUR CSR1000v
+
+			COMMAND: 
+
+			config t
+			iox
+			interface GigabitEthernet1
+			ip address dhcp
+			ip nat outside
+			no shut
+			exit
+			!
+			interface VirtualPortGroup0
+			ip address 192.168.35.1 255.255.255.0
+			ip nat inside
+			exit
+			!
+			ip nat inside source list GS_NAT_ACL interface GigabitEthernet1 overload
+			ip access-list standard GS_NAT_ACL
+			permit 192.168.0.0 0.0.255.255
+			!
+			app-hosting appid guestshell
+			 app-vnic gateway1 virtualportgroup 0 guest-interface 0
+				guest-ipaddress 192.168.35.2 netmask 255.255.255.0	
+				app-default-gateway 192.168.35.1  guest-interface 0 
+				name-server0 1.1.1.1
+			 app-resource profile custom 
+			   cpu 1500 
+			   memory 512
+			end
+
+7. Wait for the guestshell to install successfully. 
+
+	1st SSH - guestshell enable 
+	2nd SSH - guestshell run python 
+	3rd SSH - guestshell run bash 
+	
+8. To check the assigned IP Addresses try the following commands: 
+		
+		COMMANDS: 
+		
+		CSR1000v: 
+			
+			sh ip int br 
+		
+		Result: 
+		
+		Interface              IP-Address      OK? Method Status                Protocol
+		GigabitEthernet1       unassigned      YES DHCP   up                    up      
+		GigabitEthernet2       192.168.108.131 YES DHCP   up                    up      
+		GigabitEthernet3       unassigned      YES NVRAM  administratively down down    
+		VirtualPortGroup0      192.168.35.1    YES manual up                    up   
+			
+			
+		PYTHON: 
+			
+			import cli 
+			commands = [
+			   "sh ip int brief",
+			]
+			
+			for c in commands:
+				cli.executep(c)
+		
+		Result: 
+		
+		... 
+		Interface              IP-Address      OK? Method Status                Protocol
+		GigabitEthernet1       unassigned      YES DHCP   up                    up      
+		GigabitEthernet2       192.168.108.131 YES DHCP   up                    up      
+		GigabitEthernet3       unassigned      YES NVRAM  administratively down down    
+		VirtualPortGroup0      192.168.35.1    YES manual up                    up 
+
+	OTHER: ON BASH:
+	
+			sudo su
+			ip addr sho
+		
+	
+	
+9. To show version use the following. 
+
+		COMMANDS: 
+		
+		CSR1000v: 
+		
+			sh ver or sh version
+		
+		Result:
+		
+		Cisco IOS XE Software, Version 16.09.05
+		Cisco IOS Software [Fuji], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.9.5, RELEASE SOFTWARE (fc1)
+		Technical Support: http://www.cisco.com/techsupport
+		Copyright (c) 1986-2020 by Cisco Systems, Inc.
+		Compiled Thu 30-Jan-20 18:48 by mcpre
+				
+        
+		PYTHON: 
+		
+			import cli
+			 commands = [
+			    "sh version",
+			]
+			 for c in commands:
+			     cli.executep(c)
+				 
+		
+		Result:
+		Cisco IOS XE Software, Version 16.09.05
+		Cisco IOS Software [Fuji], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.9.5, RELEASE SOFTWARE (fc1)
+		Technical Support: http://www.cisco.com/techsupport
+		Copyright (c) 1986-2020 by Cisco Systems, Inc.
+		Compiled Thu 30-Jan-20 18:48 by mcpre
+		
+10. To show what are the IP Protocols set use the following: 
+
+        COMMANDS:
+		
+		CSR1000v:
+		
+		  sh ip protocols
+		  
+		Result: 
+		
+		Routing Protocol is "application"
+		Routing Protocol is "application"
+	    Sending updates every 0 seconds
+	    Invalid after 0 seconds, hold down 0, flushed after 0
+	    Outgoing update filter list for all interfaces is not set
+	    Incoming update filter list for all interfaces is not set
+	    Maximum path: 32
+	    Routing for Networks:
+	    Routing Information Sources:
+		Gateway         Distance      Last Update
+	    Distance: (default is 4) 
+		
+		PYTHON: 
+		
+			import cli
+			commands = [
+			  "sh ip protocols",
+			 ]
+			 for c in commands:
+			   cli.executep(c)
+		
+		Result:
+		
+		*** IP Routing is NSF aware ***
+        Routing Protocol is "application"
+	    Sending updates every 0 seconds
+	    Invalid after 0 seconds, hold down 0, flushed after 0
+	    Outgoing update filter list for all interfaces is not set
+	    Incoming update filter list for all interfaces is not set
+	    Maximum path: 32
+	    Routing for Networks:
+	    Routing Information Sources:
+		Gateway         Distance      Last Update
+	    Distance: (default is 4)
+	
+11. For changing hostname. 
+
+		COMMANDS: 
+		
+		CSR1000v: 
+		
+			config t
+			hostname yourname 
+		
+		Result:
+		
+		alli(config)#
+		
+		PYTHON: 
+		  import cli
+		  alli_cm = '''hostname alli'''
+		  cli.configurep (alli_cm)
+		 
+		Result:
+		
+		Line 1 SUCCESS: hostname alli
+	
+12. Check changes of hostname on your csr1000v, by pressing enter. 
+
+
+TASK 3: CREATE LOOPBACKS 
+
+- Loopbacks are addresses that is distinct or reserved IP addresses set to a device for transmitting
+  and receiving data packets. 
+  
+13. Try looking at your preferred DNS Server 
+  
+		windows button + r = ncpa.cpl 
+		
+		IPV4/TCP -> TUNAY NA LAN -> IPVE/TCP -> Properties -> Preffered DNS is 127.0.0.1 
+		
+14. Create loopbacks on CSR1000v and PYTHON 
+
+		COMMANDS: 
+		
+		CSR1000v:
+		
+			conf t 
+			int lo 1 
+			ip add 1.1.1.1 255.255.255.0
+			do sh ip int br
+		
+		Result: 
+		
+		Interface              IP-Address      OK? Method Status                Protocol
+		GigabitEthernet1       unassigned      YES DHCP   up                    up      
+		GigabitEthernet2       192.168.108.131 YES DHCP   up                    up      
+		GigabitEthernet3       unassigned      YES NVRAM  administratively down down    
+		Loopback1              1.1.1.1         YES manual up                    up      
+		VirtualPortGroup0      192.168.35.1    YES manual up                    up     
+				
+		
+		PYTHON:
+		
+		import cli 
+		(alli_cm) = '''hostname ALLI
+		 int loop 2 
+		 ip add 2.2.2.2 255.255.255.0 
+		''' 
+		cli.configurep(alli_cm)
+
+		Result: 
+		
+		Line 1 SUCCESS: hostname ALLI
+		Line 2 SUCCESS: int loopback 2
+		Line 3 SUCCESS: ip add 2.2.2.2 255.255.255.0 
+		
+		
+TASK 4:  Enabling RESTAPI in CSR1000v 
+
+16. Go to CSR1000v on your secure CRT: 
+
+		COMMANDS: 
+		
+		conf t
+		username admin privilege 15 secret pass
+		 ip http secure-server
+		 ip http authentication local
+		 restconf
+		 end
+		 
+17. Open your post man application, if it is asking for free account log in, log in using your google 
+    account. 
+	
+18. Click IMPORT -> Browse for files -> On CCNA folder on Desktop look for CISCO IOS-XE file -> open.
+
+19. Expand RESTCONF folder -> look for POST (tagged) -> Add a new loopback interface usinf the following: 
+	
+		STEPS: 
+		
+		Change the /{{host}}:{{port}} to the IP assigned in your CSR1000v (Virtual Machine). 
+		
+		Result: 
+		
+		https://192.168.108.131/restconf/data/ietf-interfaces:interfaces 
+		
+		STEPS: 
+		
+		AUTHORIZATION: Basic Auth 
+		
+		Username: admin 
+		Password: pass 
+		
+
+		HEADERS: ALL SHOULD BE CHECKED
+		
+		BODY -> RAW -> SET TO JSON FILE 
+		
+	
+20. Edit the JSON Script to create a loopback interface. 
+
+		COMMANDS: 
+		
+		{
+			"ietf-interfaces:interface": {
+				"name": "Loopback3",
+				"description": "Configured by RESTCONF",
+				"type": "iana-if-type:softwareLoopback",
+				"enabled": true,
+				"ietf-ip:ipv4": {
+					"address": [
+               			 {
+                   			 "ip": "3.3.3.3",
+                   			 "netmask": "255.255.255.0"
+               			 }
+            ]
+        }
+    }
+}
+
+       Click the SEND button.
+	   
+	   NOTIFICATION or MESSAGE -> 201 Created 
+	   
+21. To check the created loopbacks and its IP addresses, go to csr1000v and use the following: 
+	
+		COMMANDS: 
+		
+			sh ip int br
+			
+		Result: 
+		
+		Interface              IP-Address      OK? Method Status                Protocol
+		GigabitEthernet1       unassigned      YES DHCP   up                    up      
+		GigabitEthernet2       192.168.108.131 YES DHCP   up                    up      
+		GigabitEthernet3       unassigned      YES NVRAM  administratively down down    
+		Loopback1              1.1.1.1         YES manual up                    up      
+		Loopback2              2.2.2.2         YES TFTP   up                    up      
+		Loopback3              3.3.3.3         YES other  up                    up      
+		VirtualPortGroup0      192.168.35.1    YES manual up                    up      
+
+22. Now, try creating more/multiple loopbacks on your CSR1000v, PYTHON and POSTMAN application. 
+
+		COMMANDS: 
+		
+		CSR1000v: 
+		
+			conf t
+			int lo 4 
+			ip add 4.4.4.4 255.255.255.0
+			
+		*commands continues the same depending on number of loopbacks you will be ceating*
+		
+		Result: 
+		
+		Loopback4              4.4.4.4         YES manual up                    up 
+		
+		
+		PYTHON: 
+		
+			import cli 
+			(alli_cm)='''hostname ALLI
+			int loopback 5
+			ip add 5.5.5.5 255.255.255.0
+			'''
+			cli.configurep(alli_cm)
+		
+		Result: 
+		
+		Line 2 SUCCESS: int loopback 5
+        Line 3 SUCCESS: ip add 5.5.5.5 255.255.255.0
+	
+		POSTMAN:
+		
+				{
+					"ietf-interfaces:interface": {
+						"name": "Loopback6",
+						"description": "Configured by RESTCONF",
+						"type": "iana-if-type:softwareLoopback",
+						"enabled": true,
+						"ietf-ip:ipv4": {
+							"address": [
+							{
+								"ip": "6.6.6.6",
+								"netmask": "255.255.255.0"
+							}
+						]
+					}
+				},
+					"ietf-interfaces:interface": {
+						"name": "Loopback7",
+						"description": "Configured by RESTCONF",
+						"type": "iana-if-type:softwareLoopback",
+						"enabled": true,
+						"ietf-ip:ipv4": {
+							"address": [
+							{
+								"ip": "7.7.7.7",
+								"netmask": "255.255.255.0"
+							}
+						]
+					}
+				}
+			}
+		}
+
+Task 5: Deleting loopback and addresses. 
+
+		COMMANDS: 
+		
+		CSR1000v: 
+		
+			conf t
+			int lo 1
+			no ip add 1.1.1.1 255.255.255.0
+			sh ip int br
+		
+		Result: 
+		
+		Loopback1              unassigned      YES manual up                    up     
+
+		PYTHON: 
+		
+		>>> import cli
+		>>> (alli_cm)='''hostname ALLI
+		... int lo 6
+		... no ip add 6.6.6.6 255.255.255.0
+		... int lo 7
+		... no ip add 7.7.7.7 255.255.255.0 
+		... '''
+		>>> cli.configurep(alli_cm)
+		
+		Result:
+		
+		Line 1 SUCCESS: hostname ALLI
+		Line 2 SUCCESS: int lo 6
+		Line 3 SUCCESS: no ip add 6.6.6.6 255.255.255.0
+		Line 4 SUCCESS: int lo 7
+		Line 5 SUCCESS: no ip add 7.7.7.7 255.255.255.0
+		
+		
+        >>> import cli 
+		>>> commands = [
+		...    "sh ip int br",
+		... ]
+		>>> for c in commands: 
+		...     cli.executep(c)
+		
+		Result: 
+		
+		Loopback6              unassigned      YES TFTP   up                    up      
+                Loopback7              unassigned      YES TFTP   up                    up
+		
+		
+	    POSTMAN: 
+		
+		Look for DEL (tagged) to delete a loopback -> replace the host / port area to ip address 
+		-> IP ADDRESS assigned on VMWare. 
+		
+		COMMANDS: 
+		
+		https://192.168.108.131/restconf/data/ietf-interfaces:interfaces/interface=Loopback3
+		
+		Username: admin
+		Password: pass
+		
+		Headers: ALL are CHECKED 
+		
+		BODY : NONE 
+		
+		
+		Result: 
+		
+		Message/Warning: 204 No Content 
+	
+		Go back to CSR1000v:
+		
+		COMMANDS: 
+		  
+		  sh ip int br
+		
+		
+		
+		
+		
+
+		
+		
+		
+		
