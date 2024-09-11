@@ -1,0 +1,104 @@
+3rd day:
+
+task 1: how to be routing master : network
+engr:
+
+1 book [1200 pg] vs "2 rules not dikit"
+rule of routing : "ping dikit"
+dikit = 1 cable
+rule2 of routing : "route not dikit"
+
+how to do a 5 hit combo: (eigrp)
+given an ip add:
+192.168.100.55/27
+1.network
+2.range
+3.broadcast
+4.hosts
+5.subnet
+
+autonomus system numbers.
+
+
+do sh ip protocols
+
+task 3: conf ospf in rreal devices:
+@cucm @corebaba @edge
+
+kill all static route:
+
+config t
+no ip routing
+ip routing
+end
+
+single area ospf
+@CUCM
+config t
+router ospf 1
+network 10.21.100.0 0.0.0.255 area 0
+end
+
+@corebaba
+config t
+router ospf 1
+network 0.0.0.0 255.255.255.255 area 0
+end
+
+@edge
+config t
+router ospf 1
+network 10.21.21.0 0.0.0.255 area 0 
+network 200.0.0.0 0.0.0.255 area 0
+network 21.0.0.1 0.0.0.0 area 0
+do sh ip ospf nei
+do sh ip route ospf
+ 
+
+bring back static routing:
+@CUCM
+config t
+no router ospf 1
+ip route 0.0.0.0 0.0.0.0 10.21.100.4
+end
+
+@corebaba
+config t
+no router ospf 1
+ip route 0.0.0.0 0.0.0.0 10.21.21.1
+end
+
+@edge
+config t
+no router ospf 1
+ ip routing 
+ ip route 10.11.0.0 255.255.0.0 200.0.0.11
+ ip route 10.12.0.0 255.255.0.0 200.0.0.12
+! ip route 10.21.0.0 255.255.0.0 200.0.0.21
+ ip route 10.22.0.0 255.255.0.0 200.0.0.22
+ ip route 10.31.0.0 255.255.0.0 200.0.0.31
+ ip route 10.32.0.0 255.255.0.0 200.0.0.32
+ ip route 10.41.0.0 255.255.0.0 200.0.0.41
+ ip route 10.42.0.0 255.255.0.0 200.0.0.42
+ ip route 10.51.0.0 255.255.0.0 200.0.0.51
+ ip route 10.52.0.0 255.255.0.0 200.0.0.52
+ ip route 10.61.0.0 255.255.0.0 200.0.0.61
+ ip route 10.62.0.0 255.255.0.0 200.0.0.62
+ ip route 10.71.0.0 255.255.0.0 200.0.0.71
+ ip route 10.72.0.0 255.255.0.0 200.0.0.72
+ ip route 10.81.0.0 255.255.0.0 200.0.0.81
+ ip route 10.82.0.0 255.255.0.0 200.0.0.82
+ ip route 10.21.0.0 255.255.0.0 10.21.21.4
+ end
+
+
+
+task: hack your classmate
+nmap -sP 10.k.1.0/24
+nmap -v 10.32.1.10
+
+attack(open) other computer:
+nmap -v 10.k.1.10
+net use \\10.k.1.10\ipc$
+net use x: \\10.k.1.10\c$
+net use x: /delete
