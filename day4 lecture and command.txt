@@ -1,0 +1,564 @@
+day4: fundamentals of work security:
+task1: OSI Layer mastery:
+7: app layes: telnet, ssh,http,https,fbm,etc.
+6: pre layers: .exe.vbs. .bat .pl
+5 session: netbios, sql, nfs
+4 traspost: ssh, telnet, dns, http , pop, smtp
+3 Network: ip address + subnetting:
+    5hit combo: 192.168.10..89/27
+
+	net: 64
+	range: 65-95
+	broadcast:95
+	host: 2rd: 32-2 =30
+	subnet: 
+2 Datalink: ethernet frames: mac address.
+how 
+
+
+
+Task 2: how to know if you are getting hacked?
+3 ways handshake:
+
+hacker -------------> victim
+	SYN: sp,dp:
+      <--------------
+	ACK:sp,dp:
+      <------------->
+	established: pasok na pasok
+
+CUCM-12# show control-plane host open-ports
+
+how to know in windows if you are getting hacked at home!
+netstat -s -p tcp
+
+----------------------------------------------------------
+
+Task2: IMPLEMENTING BASIC CISCO NETWORK SECURITY USING ACCESS-CONTROL LIST:
+STANDARD ACL: 1-99, JOB block or permit Network/IP:
+
+config t
+no access-list 1
+access-list 1 permit 10.21.0.0 0.0.255.255
+access-list 1 permit 10.31.0.0 0.0.255.255
+access-list 1 permit 10.41.0.0 0.0.255.255
+int Gi 0/0/1
+ ip access-group 1 in
+ do sh ip access-list 1
+
+
+@@@for calling phone permited specific line/number: 
+----another version KAMILANG-----
+no ip access-list Standard KAMILANG
+IP access-list Standard KAMILANG
+	permit 10.21.0.0 0.0.255.255
+	permit 10.31.0.0 0.0.255.255
+	permit 10.41.0.0 0.0.255.255
+int Gi 0/0/1
+ ip access-group KAMILANG in
+ do sh ip access-list KAMILANG
+
+----another version KAMILANG2-----
+no ip access-list Standard KAMILANG2
+IP access-list Standard KAMILANG2
+	permit 10.12.0.0 0.0.255.255
+	permit 10.21.0.0 0.0.255.255
+	permit 10.31.0.0 0.0.255.255
+int Gi 0/0/1
+ ip access-group KAMILANG2 in
+ do sh ip access-list KAMILANG2
+
+----another version KAMILANG3-----
+no ip access-list Standard KAMILANG3
+IP access-list Standard KAMILANG3
+	permit 10.21.0.0 0.0.255.255
+	!permit 10.12.0.0 0.0.255.255
+	permit 10.31.0.0 0.0.255.255
+int Gi 0/0/1
+ ip access-group KAMILANG3 in
+ do sh ip access-list KAMILANG3
+
+----another version FRIENDSLAHAT-----
+int Gi 0/0/1
+ no ip access-group FRIENDSLAHAT in
+ do sh ip access-list FRIENDSLAHAT
+
+-----delete all version-----
+
+int Gi 0/0/1
+ ip access-group KAMILANG3 in
+
+do sh run int gi 0/0/1
+
+--------------------------------------------------------
+
+TASK3: Give Inet to edges:
+
+config t
+Ip route 0.0.0.0 0.0.0.0 200.0.0.1
+do ping 8.8.8.8
+ip domain-lookup
+ip name-server 8.8.8.8 1.1.1.1
+do ping www.cisco.com
+
+
+
+-----------------------------
+
+
+TASK 4: block all porn site: trivia: 
+all the porn sites in the world is owned by 5 companies
+
+config t
+no ip access-list Standard NOPORN
+IP access-list Standard NOPORN
+deny 66.254.0.0 0.0.255.255
+deny 104.21.0.0 0.0.255.255
+deny 68.235.0.0 0.0.255.255
+deny 104.21.0.0 0.0.255.255
+deny 208.77.20.0 0.0.255.255
+deny 172.67.133.0 0.0.255.255
+permit any
+int gi 0/0/1
+ ip access-group NOPORN in 
+ do ping www.cisco.com
+ do ping www.pornhub.com
+
+-----------------------------------------------------
+
+TASK5 : use cisco to give internet to entire buildings:
+
+bldg2: 192.168.102.20/24 GI2
+			VPNPH GI1 -- internet
+bldg3:192.168.103.20/24 GI3
+
+
+task 1: basic cisco config:
+vpnph:
+
+config t
+no logging console
+int gi 2
+no shut
+ip add 192.168.102.8 255.255.255.0
+line vty 0 14
+exec-timeout 0 0
+
+task 2: give ip add and inet to vpnvh:
+
+conf t
+int gi 1
+no shut
+ip add 192.168.108.8 255.255.255.0
+int gi 3
+no shut 
+ip add 192.168.103.8 255.255.255.0
+ip route 0.0.0.0 0.0.0.0 192.168.108.2
+ip name-server 8.8.8.8 1.1.1.1
+do ping 8.8.8.8
+
+task 3: network add translation or nat, give inet to entire comp.
+
+bldg2 will used dynamic nat using Gi 1
+bldg3 will use static nat mapping using 192.168.108.69
+
+conf t
+access-list 8 permit 192.168.102.0 0.0.0.255
+access-list 8 permit 192.168.103.0 0.0.0.255
+int gi 1
+ ip nat OUTSIDE 
+int gi 2
+ ip nat INSIDE
+int gi 3
+ ip nat INSIDE
+ip nat inside source static 192.168.103.20 192.168.108.69
+ip nat inside source list 8 interface gi 1 overload
+	
+task 5: protecting webapps and websites with basic firewall confg:
+
+config t
+int Gi 3
+ no shut
+ ip add 192.168.103.8 255.255.255.0
+ ip add 192.168.103.9 255.255.255.0 Secondary
+service finger
+service tcp-small-servers
+service udp-small-servers
+ip dns server
+ip http server
+ip http secure-server
+!Make Ping EASY
+ip host www.web8.com 192.168.103.8
+ip host www.web9.com 192.168.103.9
+
+@@@@secur website code@@@@
+
+create a firewall policy names bantayweb1 to open
+www.web8.com has http and https as open
+www.web9.com has ssh and dns as open
+	Formula:	protocol	hacker		victim 		port:
+		  tcp, udp,icmp,ip 	any		host
+
+config t
+no ip access-list extended BANTAYWEB1
+ip access-list extended BANTAYWEB1
+  Permit tcp any host www.web8.com eq 80 log 
+  Permit tcp any host www.web8.com eq 443 log 
+  Permit tcp any host www.web9.com eq 22 log 
+  Permit tcp any host www.web9.com eq 53 log 
+int gi 3
+ ip access-group BANTAYWEB1 in
+ do sh ip access-list BANTAYWEB1 
+
+------------------------------------
+
+ex.1 CREATE A FIREWALL POLICY NAMED BLUETEAM TO OPEN 
+WWW.WEB8.COM has dns, ssh, http
+WWW.WEB9.COM has telnet, ssh , https = 6 lines
+	
+example:
+config t
+no ip access-list extended BLUETEAM
+ip access-list extended BLUETEAM
+  Permit tcp any host www.web8.com eq 22 log 
+  Permit tcp any host www.web8.com eq 53 log 
+  Permit tcp any host www.web8.com eq 443 log 
+  Permit tcp any host www.web9.com eq 43 log 
+  Permit tcp any host www.web9.com eq 22 log 
+  Permit tcp any host www.web9.com eq 443 log 
+int gi 3
+ ip access-group BLUETEAM in
+ do sh ip access-list BLUETEAM
+
+------------------------------------
+
+ex.2 CREATE A FIREWALL POLICY NAMED BLUETEAM-3 TO OPEN  (list)
+WWW.WEB8.COM has telnet, dns, ssh, http
+WWW.WEB9.COM has icmp,/ping, https 
+
+---------------------------------------------
+
+ex.3 CREATE A FIREWALL POLICY NAMED BLUETEAM-4 TO OPEN 
+WWW.WEB8.COM has chargen, gaytime, finger, dns, ping
+WWW.WEB9.COM has dns, ssh, https 
+
+------------------------------------------------
+
+TASK7:MASTERING IPV6 LIKE AN EXPERT
+
+	8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+
+
+
+-----------------------------------------
+for exam 
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 3 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+
+Convert : 3 offices is 2 bits
+Addtooring/: /64 + /2 = /66
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1stOffice:      0 0  0 0 0 0  0 0 0 0  0 0 0 0 : 0000
+2ndOffice:	0 0  0 0 0 0  0 0 0 0  0 0 0 0 : 4000
+3rdOffice:	0 0  0 0 0 0  0 0 0 0  0 0 0 0 : 8000
+
+EX2:
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 50 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+50 IS 6 BITS:
+
+ADD: /64 + /6 = /70
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1stOffice:  0 0 0 0  0 0 0 0  0 0 0 0  0 0 0 0 : 0000
+2ndOffice:		 0 0  0 0 0 0  0 0 0 0 : 0400
+3rdOffice:		 0 0  0 0 0 0  0 0 0 0 : 0800
+4rdOffice:		 0 0  0 0 0 0  0 0 0 0 : 0C00
+3rdOffice:		 0 0  0 0 0 0  0 0 0 0 : 1000
+3rdOffice:		 0 0  0 0 0 0  0 0 0 0 : 1400
+
+
+-----------------------------------------------------
+
+EX3:
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 400 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+400 ID 9 BITS:
+
+ADD: /64 + /9 = /73
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1stOffice:  		   0    0 0 0  0 0 0 0 : 0000
+2ndOffice:		   1    0 0 0  0 0 0 0 : 0080
+3rdOffice:		 1 0    0 0 0  0 0 0 0 : 0100
+4rdOffice:	        0 1 1          0 0 0 0 : 0180
+5rdOffice:		1 0 0   0 0 0  0 0 0 0 : 0200
+6rdOffice:		1 0 1   0 0 0  0 0 0 0 : 0300
+7rdOffice:            0 1 1 0   0 0 0  0 0 0 0 : 0380
+8rdOffice:	      0 1 1 1	0 0 0  0 0 0 0 : 0400
+9rdOffice:	      1 0 0 0   0 0 0  0 0 0 0 : 0480
+
+-----
+
+EX4: 
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 2500 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+ 2500 is 12 bits:
+
+ADD: /64 + /12 = 76
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1stOffice:  0 0 0 0  0 0 0 0  0 0 0 0  		0000	  
+2ndOffice:		            1	       : 0010
+3rdOffice:		          1 0          : 0020
+4rdOffice:	                  1 1          : 0030
+5rdOffice:		        1 0 0          : 0040
+6rdOffice:		      0 1 0 1          : 0050
+7rdOffice:                    0 1 1 0          : 0060
+8rdOffice:	              0 1 1 1	       : 0070
+9rdOffice:		      1 0 0 0          : 0080
+
+-----
+
+EX5:
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 28 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+28 is 16 bits:
+
+ADD: /64 + /5 = /69
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1	    0 0 0 0  0				0000
+2	    0 0 0 0  1				0800
+3	    0 0 0 1  0				1000
+4	    0 0 0 1  1				1800
+5	    0 0 1 0  0				2000
+6	    0 0 0 0  0	
+7	    0 0 0 0  0
+
+------
+
+EX6:
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 450 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+450 is 9 bits:
+
+ADD: /64 + /9 = /73
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1	    0 0 0 0  0 0 0 0  0			0000
+2	    0 0 0 0  0 0 0 0  1			0080
+3	    0 0 0 0  0 0 0 1  0			0100
+4	    0 0 0 0  0 0 0 1  1			0180
+5	    0 0 0 0  0 0 1 0  0			0200
+6	    0 0 0 0  0 0 1 0  1			0280
+7	    0 0 0 0  0 0 1 1  0			0300
+
+--
+
+CONFIGURE IT:
+CONFIG T
+ipv6 unicast-routing
+int loopback 1
+!
+int loopback 2
+ ipv6 address fafa:caca:dada:bebe:0000::1/73
+!
+int loopback 3
+ ipv6 address fafa:caca:dada:bebe:0080::1/73
+!
+int loopback 4
+ ipv6 address fafa:caca:dada:bebe:0100::1/73
+!
+int loopback 5
+ ipv6 address fafa:caca:dada:bebe:0180::1/73
+!
+int loopback 6
+ ipv6 address fafa:caca:dada:bebe:0200::1/73
+!
+int loopback 7
+ ipv6 address fafa:caca:dada:bebe:0280::1/73
+
+
+----
+
+
+EX7:
+
+TASK8:  IPV6 SUBNETTING
+EX1: SUBNET fafa:caca:dada:bebe::/64 into 5000 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+  
+5000 os 13 bits
+
+ADD: /64 + /13 = /77
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1	    0 0 0 0  0 0 0 0  0	0 0 0  0   	0000
+2	    0 0 0 0  0 0 0 0  0 0 0 0  1	0008
+3	    0 0 0 0  0 0 0 0  0 0 0 1  0	0010
+4	    0 0 0 0  0 0 0 0  0 0 0 1  1	0018
+5	    0 0 0 0  0 0 0 0  0 0 1 0  1	0028		
+6	    0 0 0 0  0 0 0 0  0 0 1 1  0	0030	
+7	    0 0 0 0  0 0 0 0  0 0 1 1  1	0038		
+8	    0 0 0 0  0 0 0 0  0	1 0 0  0	0040
+9	    0 0 0 0  0 0 0 0  0	1 0 0  1        0048
+10	    0 0 0 0  0 0 0 0  0 1 0 1  0        0050
+
+CONFIG T
+ipv6 unicast-routing
+!
+int loopback 1
+ ipv6 address fafa:cafe:face:cafe:0000::1/77
+!
+int loopback 2
+ ipv6 address fafa:cafe:face:cafe:0008::1/77
+!
+int loopback 3
+ ipv6 address fafa:cafe:face:cafe:0010::1/77
+!
+int loopback 4
+ ipv6 address fafa:cafe:face:cafe:0018::1/77
+!
+int loopback 5
+ ipv6 address fafa:cafe:face:cafe:0028::1/77
+!
+int loopback 6
+ ipv6 address fafa:cafe:face:cafe:0030::1/77
+!
+int loopback 7
+ ipv6 address fafa:cafe:face:cafe:0038::1/77
+!
+int loopback 8
+ ipv6 address fafa:cafe:face:cafe:0040::1/77
+!
+int loopback 9
+ ipv6 address fafa:cafe:face:cafe:0048::1/77
+!
+int loopback 9
+ ipv6 address fafa:cafe:face:cafe:0050::1/77
+
+do sh ipv6 int br
+
+
+--------------
+
+LALABAS SA EXAM:
+EX: SUBNET feco:feco:aabb:ddee::/64 into 6 offices:
+Rivan CAI Method: Convert, Add, iChambaMo
+6 is 3bits
+
+ADD: /64 + /3 = /67
+iChambaMo
+	    8 4 2 1  8 4 2 1  8 4 2 1  8 4 2 1 
+1	    0 0 0 				0000
+2	    0 0 1 				2000
+3	    0 1 0  				4000
+4	    0 1 1   				6000
+5	    1 0 0    				8000
+6	    1 0 1  				a000
+
+CONFIG T
+ipv6 unicast-routing
+!
+int loopback 1
+ ipv6 address fec0:feco:aabb:ddee:0000::1/67
+!
+int loopback 2
+ ipv6 address fec0:feco:aabb:ddee:2000::1/67
+!
+int loopback 3
+ ipv6 address fec0:feco:aabb:ddee:3000::1/67
+!
+int loopback 4
+ ipv6 address fec0:feco:aabb:ddee:4000::1/67
+!
+int loopback 5
+ ipv6 address fec0:feco:aabb:ddee:6000::1/67
+!
+int loopback 6
+ ipv6 address fec0:feco:aabb:ddee:8000::1/67
+
+do sh ipv6 int br
+
+
+----for exam also---
+
+EX2 IPV4 and IPV6 DUAL STACK SUBNETTED CONFIG: 2HIT COMBO:
+EX8: DESIGN AND CONFIGURE A NETWORK FOR
+10.0.0.0/8 AND fc00:abef:deef::/48 into offices Each.
+c: 100 is 7bits
+A: /8 + 7 = 15, 2nd,2i
+
+----DUAL STACK---
+
+config t
+int loopback 1
+ ip add 10.2.0.1 255.254.0.0
+ ipv6 add fc00:abef:deef:0000::1/55
+int loopback 2
+ ip add 10.4.0.1 255.254.0.0
+ ipv6 add fc00:abef:deef:0200::1/55
+int loopback 3
+ ip add 10.6.0.1 255.254.0.0
+ ipv6 add fc00:abef:deef:0400::1/55
+int loopback 4
+ ip add 10.8.0.1 255.254.0.0
+ ipv6 add fc00:abef:deef:0600::1/55
+int loopback 5
+ ip add 10.10.0.1 255.254.0.0
+ ipv6 add fc00:abef:deef:0800::1/55
+
+do sh ip int br
+
+---SECURITY TASK # 9: TELNET[not secure] vs SSH:[secure]
+configuring SSH on Cisco: piliin "1024"
+CONFIG T
+ip domain-name rivanccna.com
+crypto key generate rsa
+ip ssh version 2
+ip ssh time-out 120 
+end
+
+---SECURITY TASK # 9: ftp: file transfer protocol:
+FTP is network file storate system that runs tcp port 21
+step1: set a ftp server:
+
+d:\_LAGAYDITO
+
+cucm-12#: 
+copy run ftp:
+10.21.1.10
+cucmSept12.txt	  
+
+
+------------------
+@@@@LAB EXAM@@@@@
+NETWORK TIME PROTOCOL: NTP
+synchrozies all the timer of cisco devices:
+
+VPNFWPH#show clock 
+
+configure cisco to UseAmericanTime: Pacific
+
+config t
+ntp server 216.239.35.8
+end
+show ntp associations
+
+show clock
+
+
+!copy run tftp:
