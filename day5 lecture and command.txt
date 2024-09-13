@@ -1,0 +1,110 @@
+day 5:
+
+ping -t 10.21.1.88
+
+TAAS/BABA: to be color green 11 & 12 PORT
+config t
+Int Range fa0/10-12
+ shutdown
+ no shutdown
+!
+ switchport trunk Encap Dot1Q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-100 
+ do sh int trunk
+
+do sh int trunk 
+do sh spanning-tree vlan1
+sh processes cpu | inc uti
+sh spanning-tree mst configuration 
+do sh mac address-table
+do sh port-security address
+sh int status Err-disabled 
+
+do sh spanning-tree vlan 1
+
+
+{
+sh int status Err-disabled 		(3-7 dead)
+
+TAAS: bounce/UP/down, bring BACK TO LIFE.
+config t
+int fa 0/3
+ shut
+ no shut
+int fa 0/7
+ shut
+ no shut
+end
+}
+
+
+
+spine leaf
+collapsed backbone network design
+core distribution model
+data center
+
+kali yersinia
+https://www.youtube.com/watch?v=v6CGKLXeKlA
+
+TASK17: Port-Aggregation/Etherchannel:
+LACP:LINK AGGREGATION CONTROL PROTOCOL = ieee worldStandrad
+cisco = PortAggregationProtocl: PaGP
+Combinding Two/More Layer 2 links AS ONE! Unite/UNITY
+@taas/BABA:
+config t
+Int Range fa0/10-12
+ channel-group 1 mode active
+ channel-protocol Lacp
+ do sh etherchannel summary
+ do sh int po1 | inc BW
+
+
+@@@ HOW TO PASS THE EXAM IN 1 MONTH:
+STEP 1: PRACTICE ALL THE LABS DAILY:
+1. 
+
+
+
+
+IPV4 &IPV6 & SUBNETTING & CONFIGURATION
+2. WTICH LACP using LACP vs PAGP
+3. VTP SERVER, VTP TRANSPARENT
+
+
+int range e2/1-2
+
+
+@@@@
+vtp configuration:
+Config t
+vtp domain ccna
+vtp password rivan
+vtp mode server or client or transpert
+do sh vtp status
+
+@@ PAGP and LACP on EXAM
+@a1
+config t
+int range e0/1-2
+ channel-group 1 mode desirable
+ channel-protocol pagp
+@a2
+int range e1/1-2 e0/1, e0/2
+ channel-group 2 mode active
+ channel-protocol lacp
+@d2
+int range e1/2-3
+ channel-group 3 mode active
+ channel-protocol lacp
+
+
+@@@@@
+ExamLab3:
+Compute and configure: to subnet to 40 offices:
+192.168.100.0/24
+bafa:bafa:fafa::/48
+
+
+HOW TO REVIEW 1200 
