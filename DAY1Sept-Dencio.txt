@@ -393,7 +393,7 @@ route  add  200.0.0.0   mask  255.255.255.0   10.21.1.4
 ********************************************
 
  
-@@@@@@@@@
+@@@@@@@@@ CALL MNGR PILOT ANSWER, COREBABA @@@@@@
 
 config t
 dial-peer voice 69 voip
@@ -433,6 +433,12 @@ application
   param queue-manager-debugs 1
   param number-of-hunt-grps 4
 ****************************************************************************
+HOW TO FIX A SHYT
+config t 
+ application
+ no service callqueue flash:app-b-acd-2.1.2.2.tcl
+ no service rivanaa flash:app-b-acd-2.1.2.2.tcl
+
 INSTALL DNS - DOMAIN NAME SERVER
 
 OPEN CMD
