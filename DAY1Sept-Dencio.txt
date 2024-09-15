@@ -346,7 +346,7 @@ config t
 	 ip add 21.0.0.1 255.255.255.255
  end
 
- !!!STATIC ROUTING FOR MININUM WAGERS: 645php/day
+ !!!STATIC ROUTING FOR MININUM WAGERS: 645php/day ==PARA MAKATAWAG NA==
  !!! EDGE route NOT dikit to ClassMate:
 conf t
  ip routing 
