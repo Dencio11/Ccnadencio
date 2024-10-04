@@ -1,0 +1,19 @@
+{
+    "device": {
+        "host": "192.168.102.5",
+        "username": "admin",
+        "password": "pass",
+        "device_type": "cisco_ios"
+    },
+    "interface_config1": {
+        "interface": "Loopback1",
+        "new_ip": "1.1.1.1",
+        "subnet_mask": "255.255.255.255"
+    },
+    "interface_config2": {
+        "interface": "Loopback2",
+        "new_ip": "2.2.2.2",
+        "subnet_mask": "255.255.255.255"
+    },
+    "new_hostname": "APP1py2"
+}
