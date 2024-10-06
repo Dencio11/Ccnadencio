@@ -114,6 +114,13 @@ Int Gi 0/0/1
  ip access-group NOCOL1 in
  end
 
+!!REMOVE ACL: PING / CALL ALL:
+config t
+int gi 0/0/1
+ No ip access-group WITHSALAMAIN in
+ No ip access-group NOSALAMIN in
+end
+ 
 TASK3: When you become a Security Analyst:
 Learn to Block the IPaddress from 3 "BAD" countries:
 NorthKorea, RUSSIA, China.= where all the Best hackers live.
@@ -212,7 +219,7 @@ intentionally hackable websites
 task6: How to Make CUCM intentionally hackable to Learn
 the Basics for Firewalls.
 before: nmap -v 10.m.100.8
-@Cucm:
+@Cucm: fa 0/0 or CSR1000V = gi 3
 config t
 int Gi 3
  no shut
