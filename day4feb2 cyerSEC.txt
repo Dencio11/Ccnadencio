@@ -17,7 +17,8 @@ how to attack 139/445? because you DONT have a firewall!
 
 net  use  \\10.k.1.10\ipc$  "attacks 139, and connects to it."
 "privilege escalation"
-net  use  s: \\10.k.1.10\c$  /user:administrator
+net use x: /delete
+net  use  x: \\10.k.1.10\c$  /user:administrator
 
 SERVICES VS PORTS:
 WEB SERVER RUNS ON PORT 80, IF YOUR CLASSMATE PORT 80 OPEN? IT IS A WEB SERVER!
@@ -37,9 +38,16 @@ FROM ENTERING YOUR NETWORK.
 step1: give Unlimited internet to EDGE:
 @edge
 CONFIG T
-IP ROUTE 0.0.0.0  0.0.0.0 200.0.0.1
+no logging console
+int gi 2
+no shut
+IP ROUTE 192.168.102.5 255.255.255.0
+IP ROUTE 0.0.0.0 0.0.0.0 192.168.108.2
 ip name-server 8.8.8.8
 ip domain-lookup
+INT GI 1
+no shut
+ip add 192.168.108.5 25
 ALL THE PORN SITES THE WORLD ARE OWNED BY 5 COMPANIES:
 
 config t
@@ -51,8 +59,44 @@ DENY 68.235.0.0 0.0.255.255
 DENY 104.17.0.0 0.0.255.255
 DENY 88.208.0.0 0.0.255.255
 Permit Any
-Int Gi 0/0/1
+Int Gi 1
  ip access-group NOPORN1 in
+ end
+
+TASK 1.2 BLOCK SCHOOL:
+ping www.dlsu.edu.ph 172.76.14.0
+ping www.ccp.edu.ph 50.6.160.0
+ping www.feu.edu.ph 184.168.125.0
+ping www.ue.edu.ph 155.137.92.0
+
+conf t
+NO ip access-list standard NOSCHOOL
+ip access-list standard NOSCHOOL
+DENY 172.76.14.0 0.0.0.255
+DENY 50.6.160.0 0.0.0.255
+DENY 184.168.125.0 0.0.0.255
+DENY 155.137.92.0 0.0.0.255
+Permit Any
+Int Gi 1
+ ip access-group NOSCHOOL in
+ end
+
+TASK 1.3 BLOCK BANK:
+bpi 151.101.3.10
+ub 45.79.222.138
+bdo 118.215.79.125
+psbank 104.18.29.175
+
+conf t
+NO ip access-list standard NOBANK
+ip access-list standard NOBANK
+DENY 151.101.3.0 0.0.0.255
+DENY 45.79.222.0 0.0.0.255
+DENY 118.215.79.0 0.0.0.255
+DENY 104.18.29.0 0.0.0.255
+Permit Any
+Int Gi 1
+ ip access-group NOBANK in
  end
 
 TASK2: USE STANDARD ACCESS-LIST TO BLOCK OTHER CONTRIES/CLASSMATE:
